@@ -1,3 +1,6 @@
+from distances import Disances
+
+
 class Cell(object):
     """docstring for Cell"""
     def __init__(self, row, column):
@@ -39,5 +42,22 @@ class Cell(object):
 
         return neighbours
 
+    def distances(self):
+        distances = Disances(self)
+        frontier = [self]
+
+        while frontier:             # check if elem in frontier
+            new_frontier = []
+            for cell in frontier:
+                for linked in cell.links:
+                    if distances[linked] is not None:
+                        continue
+                    distances[linked] = distances[cell] + 1
+                    new_frontier.append(linked)
+
+            frontier = new_frontier
+
+        return distances
+
     def __str__(self):
-        return f'({self.row} {self.column})'
+        return f'(row: {self.row} col: {self.column})'

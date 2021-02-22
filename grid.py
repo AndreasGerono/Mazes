@@ -54,6 +54,9 @@ class Grid(object):
     def each_cell(self):
         return (cell for row in self.each_row() for cell in row)
 
+    def content_of(self, cell):
+        return "    "
+
     def __str__(self):
         output = "+" + "----+" * self.columns + "\n"
 
@@ -62,7 +65,7 @@ class Grid(object):
             bottom = "+"
 
             for cell in row:
-                body = "    "
+                body = self.content_of(cell)
                 if cell.is_linked(cell.east):
                     east_boundry = " "
                 else:
@@ -82,7 +85,7 @@ class Grid(object):
         return output
 
     def to_png(self, cell_size=50):
-        handler = PNG_handler(self.columns*cell_size + cell_size, self.rows*cell_size + cell_size)  # noqa: E501
+        handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
         for row in self.each_row():
             for cell in row:
                 x1 = cell.column * cell_size

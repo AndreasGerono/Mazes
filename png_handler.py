@@ -1,15 +1,15 @@
 import png
 
-WHITE = 255
-BLACK = 0
+WHITE = 0
+BLACK = 255
 
 
 class PNG_handler(object):
     """docstring for PNG_handler"""
     def __init__(self, width, height):
         super(PNG_handler, self).__init__()
-        self.width = width
-        self.height = height
+        self.width = width+5
+        self.height = height+5
         self.buffer = self.__prepare_buffer__()
 
     def __prepare_buffer__(self):
@@ -22,16 +22,14 @@ class PNG_handler(object):
         return grid
 
     def __write_v_points__(self, x1, x2, y1):
-        for y in range(self.height):
-            for x in range(self.width):
-                if (x1 <= x < x2) and y == y1:
-                    self.buffer[y][x] = BLACK
+        for x in range(self.width):
+            if (x1 <= x < x2) and y1 < self.height:
+                self.buffer[y1][x] = BLACK
 
     def __write_h_points__(self, y1, y2, x1):
         for y in range(self.height):
-            for x in range(self.width):
-                if (y1 <= y < y2) and x == x1:
-                    self.buffer[y][x] = BLACK
+            if (y1 <= y < y2) and x1 < self.width:
+                self.buffer[y][x1] = BLACK
 
     def write_v_line(self, x1, x2, y, height=2):
         for i in range(height):
