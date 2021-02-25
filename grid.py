@@ -87,7 +87,7 @@ class Grid(object):
 
         return output
 
-    def to_png(self, cell_size=50):
+    def to_png(self, cell_size=30):
 
         handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
 

@@ -1,15 +1,15 @@
 import png
 
-WHITE = 255
-BLACK = 0
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 
 class PNG_handler(object):
     """docstring for PNG_handler"""
     def __init__(self, width, height):
         super(PNG_handler, self).__init__()
-        self.width = width+5
-        self.height = height+5
+        self.width = width+2
+        self.height = height+2
         self.buffer = self.__prepare_buffer__()
 
     def __prepare_buffer__(self):
@@ -33,19 +33,32 @@ class PNG_handler(object):
 
     def write_v_line(self, x1, x2, y, height=2, color=BLACK):
         for i in range(height):
-            self.__write_v_points__(x1, x2, y+i, color)
+            self.__write_v_points__(x1, x2+height, y+i, color)
 
     def write_h_line(self, y1, y2, x, height=2, color=BLACK):
         for i in range(height):
-            self.__write_h_points__(y1, y2, x+i, color)
+            self.__write_h_points__(y1, y2+height, x+i, color)
 
     def rect(self, x1, y1, w, h, color):
         self.write_v_line(x1, x1+w, y1, h, color)
 
+    @property
+    def flat_buffer(self):
+        flat_buffer = []
+        for row in self.buffer:
+            rows = []
+            for column in row:
+                for rgb in column:
+                    rows.append(rgb)
+
+            flat_buffer.append(rows)
+
+        return flat_buffer
+
     def to_png(self):
-        w = png.Writer(self.width, self.height, greyscale=True)
+        w = png.Writer(self.width, self.height, greyscale=False)
         with open('maze.png', 'wb') as f:
-            w.write(f, self.buffer)
+            w.write(f, self.flat_buffer)
 
 
 def main():
