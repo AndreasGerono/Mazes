@@ -1,4 +1,4 @@
-from distances import Disances
+from distances import Distances
 
 
 class Cell(object):
@@ -43,7 +43,7 @@ class Cell(object):
         return neighbours
 
     def distances(self):
-        distances = Disances(self)
+        distances = Distances(self)
         frontier = [self]
 
         while frontier:             # check if elem in frontier

@@ -57,6 +57,9 @@ class Grid(object):
     def content_of(self, cell):
         return "    "
 
+    def background_color_for_cell(self, cell):
+        return False
+
     def __str__(self):
         output = "+" + "----+" * self.columns + "\n"
 
@@ -85,23 +88,32 @@ class Grid(object):
         return output
 
     def to_png(self, cell_size=50):
+
         handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
-        for row in self.each_row():
-            for cell in row:
-                x1 = cell.column * cell_size
-                y1 = cell.row * cell_size
-                x2 = (cell.column + 1) * cell_size
-                y2 = (cell.row + 1) * cell_size
 
-                if cell.north is None:
-                    handler.write_v_line(x1, x2, y1)    # North wall
+        for bg in range(2):
+            for row in self.each_row():
+                for cell in row:
+                    x1 = cell.column * cell_size
+                    y1 = cell.row * cell_size
+                    x2 = (cell.column + 1) * cell_size
+                    y2 = (cell.row + 1) * cell_size
 
-                if cell.west is None:
-                    handler.write_h_line(y1, y2, x1)    # west wall
+                    if (bg == 0):
+                        color = self.background_color_for_cell(cell)
+                        if color is not None:
+                            handler.rect(x1, y1, cell_size, cell_size, color)
 
-                if not cell.is_linked(cell.east):
-                    handler.write_h_line(y1, y2, x2)    # east wall
+                    else:
+                        if cell.north is None:
+                            handler.write_v_line(x1, x2, y1)    # North wall
 
-                if not cell.is_linked(cell.south):
-                    handler.write_v_line(x1, x2, y2)    # south wall
+                        if cell.west is None:
+                            handler.write_h_line(y1, y2, x1)    # west wall
+
+                        if not cell.is_linked(cell.east):
+                            handler.write_h_line(y1, y2, x2)    # east wall
+
+                        if not cell.is_linked(cell.south):
+                            handler.write_v_line(x1, x2, y2)    # south wall
             handler.to_png()
