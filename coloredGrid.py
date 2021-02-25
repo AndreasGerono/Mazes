@@ -18,11 +18,10 @@ class ColoredGrid(Grid):
 
     def background_color_for_cell(self, cell):
         distance = self.distances[cell]
-        color = (0, 0, 0)
         if distance is not None:
             intensity = float(self.maximum - distance) / self.maximum
             dark = round(255 * intensity)
             bright = 128 + round(127 * intensity)
-            color = (bright, dark, dark)
+            color = (dark, bright, dark)
 
-        return color
+            return color

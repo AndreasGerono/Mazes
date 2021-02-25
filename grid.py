@@ -58,7 +58,7 @@ class Grid(object):
         return "    "
 
     def background_color_for_cell(self, cell):
-        return False
+        return None
 
     def __str__(self):
         output = "+" + "----+" * self.columns + "\n"
@@ -106,14 +106,14 @@ class Grid(object):
 
                     else:
                         if cell.north is None:
-                            handler.write_v_line(x1, x2, y1)    # North wall
+                            handler.write_h_line(x1, x2, y1)    # North wall
 
                         if cell.west is None:
-                            handler.write_h_line(y1, y2, x1)    # west wall
+                            handler.write_v_line(y1, y2, x1)    # west wall
 
                         if not cell.is_linked(cell.east):
-                            handler.write_h_line(y1, y2, x2)    # east wall
+                            handler.write_v_line(y1, y2, x2)    # east wall
 
                         if not cell.is_linked(cell.south):
-                            handler.write_v_line(x1, x2, y2)    # south wall
+                            handler.write_h_line(x1, x2, y2)    # south wall
             handler.to_png()

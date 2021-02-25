@@ -1,6 +1,6 @@
 import png
 
-WHITE = (255, 255, 255)
+GREY = (200, 200, 200)
 BLACK = (0, 0, 0)
 
 
@@ -17,30 +17,30 @@ class PNG_handler(object):
         for r in range(self.height):
             rows = []
             for c in range(self.width):
-                rows.append(WHITE)
+                rows.append(GREY)
             grid.append(rows)
         return grid
 
-    def __write_v_points__(self, x1, x2, y1, color=BLACK):
+    def __write_h_points__(self, x1, x2, y1, color=BLACK):
         for x in range(self.width):
             if (x1 <= x < x2) and y1 < self.height:
                 self.buffer[y1][x] = color
 
-    def __write_h_points__(self, y1, y2, x1, color=BLACK):
+    def __write_v_points__(self, y1, y2, x1, color=BLACK):
         for y in range(self.height):
             if (y1 <= y < y2) and x1 < self.width:
                 self.buffer[y][x1] = color
 
-    def write_v_line(self, x1, x2, y, height=2, color=BLACK):
+    def write_h_line(self, x1, x2, y, height=2, color=BLACK):
         for i in range(height):
-            self.__write_v_points__(x1, x2+height, y+i, color)
+            self.__write_h_points__(x1, x2, y+i, color)
 
-    def write_h_line(self, y1, y2, x, height=2, color=BLACK):
+    def write_v_line(self, y1, y2, x, height=2, color=BLACK):
         for i in range(height):
-            self.__write_h_points__(y1, y2+height, x+i, color)
+            self.__write_v_points__(y1, y2, x+i, color)
 
-    def rect(self, x1, y1, w, h, color):
-        self.write_v_line(x1, x1+w, y1, h, color)
+    def rect(self, x, y, w, h, color):
+        self.write_h_line(x, x+w, y, h, color)
 
     @property
     def flat_buffer(self):
@@ -65,7 +65,7 @@ def main():
 
     width = 100
     height = 100
-    cell_size = 10
+    cell_size = 20
 
     handle = PNG_handler(width, height)
 
@@ -74,8 +74,8 @@ def main():
     x2 = (0+1)*cell_size
     y2 = (0+1)*cell_size
 
-    for row in range(10):
-        for col in range(5):
+    for row in range(width):
+        for col in range(height):
             x1 = row*cell_size
             y1 = col*cell_size
             x2 = (row+1)*cell_size
@@ -84,6 +84,10 @@ def main():
             handle.write_v_line(x1, x2, y1)
             handle.write_h_line(y1, y2, x1)
             handle.write_h_line(y1, y2, x2)
+
+            # if row == rect_loc[0] and col == rect_loc[1]:
+
+    handle.rect(1*cell_size, 4*cell_size, cell_size, cell_size, (255, 0, 0))
 
     handle.to_png()
 
