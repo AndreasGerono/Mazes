@@ -1,11 +1,10 @@
-from distancegrid import DistanceGrid
+from coloredGrid import ColoredGrid
 from binary_tree import BinaryTree
 from sidewinder import Sidewinder
-from wilson import Wilson
 
-grid = DistanceGrid(15, 15)
+grid = ColoredGrid(15, 15)
 # BinaryTree.on(grid)
-Wilson.on(grid)
+Sidewinder.on(grid)
 
 start = grid[0, 0]
 
@@ -14,7 +13,6 @@ new_start, distance = distances.max()
 
 new_distances = new_start.distances()
 goal, distances = new_distances.max()
-
 grid.distances = new_distances.path_to(goal)
 
 print(grid)

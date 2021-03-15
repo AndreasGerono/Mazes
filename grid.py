@@ -5,11 +5,12 @@ from png_handler import PNG_handler
 
 class Grid(object):
     """docstring for Grid"""
-    def __init__(self, rows, columns):
+    def __init__(self, rows, columns, color=(255, 255, 255)):
         super(Grid, self).__init__()
         self.rows = rows
         self.columns = rows
         self.grid = self.prepare_grid()
+        self.color = color
         self.configure_cells()
 
     def prepare_grid(self):
@@ -87,7 +88,7 @@ class Grid(object):
 
         return output
 
-    def to_png(self, cell_size=30):
+    def to_png(self, file_name='maze.png', cell_size=30):
 
         handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
 
@@ -116,4 +117,4 @@ class Grid(object):
 
                         if not cell.is_linked(cell.south):
                             handler.write_h_line(x1, x2, y2)    # south wall
-            handler.to_png()
+            handler.to_png(file_name=file_name)

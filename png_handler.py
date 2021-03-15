@@ -1,7 +1,8 @@
 import png
+import numpy as np
 
 GREY = (200, 200, 200)
-BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 
 class PNG_handler(object):
@@ -10,7 +11,7 @@ class PNG_handler(object):
         super(PNG_handler, self).__init__()
         self.width = width+2
         self.height = height+2
-        self.buffer = self.__prepare_buffer__()
+        self.buffer = np.zeros((height+2, width+2, 3), dtype=int)
 
     def __prepare_buffer__(self):
         grid = []
@@ -21,21 +22,21 @@ class PNG_handler(object):
             grid.append(rows)
         return grid
 
-    def __write_h_points__(self, x1, x2, y1, color=BLACK):
+    def __write_h_points__(self, x1, x2, y1, color=WHITE):
         for x in range(self.width):
             if (x1 <= x < x2) and y1 < self.height:
                 self.buffer[y1][x] = color
 
-    def __write_v_points__(self, y1, y2, x1, color=BLACK):
+    def __write_v_points__(self, y1, y2, x1, color=WHITE):
         for y in range(self.height):
             if (y1 <= y < y2) and x1 < self.width:
                 self.buffer[y][x1] = color
 
-    def write_h_line(self, x1, x2, y, height=2, color=BLACK):
+    def write_h_line(self, x1, x2, y, height=2, color=WHITE):
         for i in range(height):
             self.__write_h_points__(x1, x2, y+i, color)
 
-    def write_v_line(self, y1, y2, x, height=2, color=BLACK):
+    def write_v_line(self, y1, y2, x, height=2, color=WHITE):
         for i in range(height):
             self.__write_v_points__(y1, y2, x+i, color)
 
@@ -55,9 +56,9 @@ class PNG_handler(object):
 
         return flat_buffer
 
-    def to_png(self):
+    def to_png(self, file_name='maze.png'):
         w = png.Writer(self.width, self.height, greyscale=False)
-        with open('maze.png', 'wb') as f:
+        with open(file_name, 'wb') as f:
             w.write(f, self.flat_buffer)
 
 
