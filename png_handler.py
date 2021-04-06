@@ -3,6 +3,7 @@ import numpy as np
 
 GREY = (200, 200, 200)
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 
 class PNG_handler(object):
@@ -22,21 +23,21 @@ class PNG_handler(object):
             grid.append(rows)
         return grid
 
-    def __write_h_points__(self, x1, x2, y1, color=WHITE):
+    def __write_h_points__(self, x1, x2, y1, color=BLACK):
         for x in range(self.width):
             if (x1 <= x < x2) and y1 < self.height:
                 self.buffer[y1][x] = color
 
-    def __write_v_points__(self, y1, y2, x1, color=WHITE):
+    def __write_v_points__(self, y1, y2, x1, color=BLACK):
         for y in range(self.height):
             if (y1 <= y < y2) and x1 < self.width:
                 self.buffer[y][x1] = color
 
-    def write_h_line(self, x1, x2, y, height=2, color=WHITE):
+    def write_h_line(self, x1, x2, y, height=2, color=BLACK):
         for i in range(height):
             self.__write_h_points__(x1, x2, y+i, color)
 
-    def write_v_line(self, y1, y2, x, height=2, color=WHITE):
+    def write_v_line(self, y1, y2, x, height=2, color=BLACK):
         for i in range(height):
             self.__write_v_points__(y1, y2, x+i, color)
 
