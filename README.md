@@ -1,2 +1,2 @@
 # Mazes
-My mazes from book "Mazes for programmers"
+My mazes from book "Mazes for programmers."
