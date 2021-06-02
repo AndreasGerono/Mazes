@@ -3,9 +3,10 @@ from grid import Grid
 
 class ColoredGrid(Grid):
     """docstring for Grid"""
-    def __init__(self, rows, columns):
-        super().__init__(rows, columns)
+    def __init__(self, rows, columns, color=(0, 255, 0)):
         self.maximum = 0
+        self.color = color
+        super().__init__(rows, columns)
 
     @property
     def distances(self):
@@ -22,6 +23,7 @@ class ColoredGrid(Grid):
             intensity = float(self.maximum - distance) / self.maximum
             dark = round(255 * intensity)
             bright = 128 + round(127 * intensity)
-            color = (dark, dark, bright)
+            color = [dark, bright, dark]
 
+            color.append(255)
             return color

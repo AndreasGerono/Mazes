@@ -1,21 +1,28 @@
 import random
 
 
-class HountAndKill(object):
-    """docstring for HountAndKill"""
+class HuntAndKill(object):
+    """docstring for HuntAndKill"""
     def on(grid):
-        cell = grid.random_cell()
-        visited = list()
-        visited.append(cell)
+        current = grid.random_cell()
 
-        while (len(visited) < grid.size()-1):
-            neighbor = random.choice(cell.neighbours())
+        while current is not None:
+            unvisited_neighbours = [neighbour for neighbour in current.neighbours() if not neighbour.links]  # noqa: E501
 
-            while (neighbor in visited):
-                neighbor = random.choice(cell.neighbours())
+            # Random walk
+            if unvisited_neighbours:
+                neighbour = random.choice(unvisited_neighbours)
+                current.link(neighbour)
+                current = neighbour
 
-            if not neighbor.links:
-                cell.link(neighbor)
-                visited.update(cell)
+            # Hunt mode
+            else:
+                current = None
 
-            cell = neighbor
+                for cell in grid.each_cell():
+                    visited_neighbours = [neighbour for neighbour in cell.neighbours() if neighbour.links]  # noqa: E501
+                    if not cell.links and visited_neighbours:
+                        current = cell
+                        neighbour = random.choice(visited_neighbours)
+                        current.link(neighbour)
+                        break

@@ -5,12 +5,11 @@ from png_handler import PNG_handler
 
 class Grid(object):
     """docstring for Grid"""
-    def __init__(self, rows, columns, color=(255, 255, 255)):
+    def __init__(self, rows, columns):
         super(Grid, self).__init__()
         self.rows = rows
-        self.columns = rows
+        self.columns = columns
         self.grid = self.prepare_grid()
-        self.color = color
         self.configure_cells()
 
     def prepare_grid(self):
@@ -34,11 +33,15 @@ class Grid(object):
         for r in range(self.rows):
             for c in range(self.columns):
                 cell = self[r, c]
-                row, col = cell.row, cell.column
-                self[r, c].north = self[row-1, col]
-                self[r, c].south = self[row+1, col]
-                self[r, c].west = self[row, col-1]
-                self[r, c].east = self[row, col+1]
+                if cell is not None:
+                    row, col = cell.row, cell.column
+                    self[r, c].north = self[row-1, col]
+                    self[r, c].south = self[row+1, col]
+                    self[r, c].west = self[row, col-1]
+                    self[r, c].east = self[row, col+1]
+
+    def deadends(self):
+        return [cell for cell in self.each_cell() if len(cell.links) == 1]
 
     def random_cell(self):
         row = random.randrange(self.rows)
@@ -70,14 +73,14 @@ class Grid(object):
 
             for cell in row:
                 body = self.content_of(cell)
-                if cell.is_linked(cell.east):
+                if cell is not None and cell.is_linked(cell.east):
                     east_boundry = " "
                 else:
                     east_boundry = "|"
 
                 top += body + east_boundry
 
-                if cell.is_linked(cell.south):
+                if cell is not None and cell.is_linked(cell.south):
                     south_boundry = "    "
                 else:
                     south_boundry = "----"
@@ -91,10 +94,12 @@ class Grid(object):
     def to_png(self, file_name='maze.png', cell_size=30):
 
         handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
-
         for bg in range(2):
             for row in self.each_row():
                 for cell in row:
+                    if cell is None:
+                        continue
+
                     x1 = cell.column * cell_size
                     y1 = cell.row * cell_size
                     x2 = (cell.column + 1) * cell_size

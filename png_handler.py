@@ -1,9 +1,9 @@
 import png
 import numpy as np
 
-GREY = (200, 200, 200)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+GREY = (200, 200, 200, 128)
+WHITE = (255, 255, 255, 128)
+BLACK = (0, 0, 0, 255)
 
 
 class PNG_handler(object):
@@ -12,7 +12,7 @@ class PNG_handler(object):
         super(PNG_handler, self).__init__()
         self.width = width+2
         self.height = height+2
-        self.buffer = np.zeros((height+2, width+2, 3), dtype=int)
+        self.buffer = np.zeros((height+2, width+2, 4), dtype=int)
 
     def __prepare_buffer__(self):
         grid = []
@@ -58,7 +58,7 @@ class PNG_handler(object):
         return flat_buffer
 
     def to_png(self, file_name='maze.png'):
-        w = png.Writer(self.width, self.height, greyscale=False)
+        w = png.Writer(self.width, self.height, alpha='RGBA', greyscale=False)
         with open(file_name, 'wb') as f:
             w.write(f, self.flat_buffer)
 
@@ -89,7 +89,7 @@ def main():
 
             # if row == rect_loc[0] and col == rect_loc[1]:
 
-    handle.rect(1*cell_size, 4*cell_size, cell_size, cell_size, (255, 0, 0))
+    handle.rect(1*cell_size, 4*cell_size, cell_size, cell_size, (255, 0, 0, 128))
 
     handle.to_png()
 
