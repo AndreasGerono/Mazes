@@ -1,6 +1,5 @@
 import random
 import png
-import numpy as np
 
 
 class Mask(object):

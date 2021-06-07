@@ -92,8 +92,8 @@ class Grid(object):
         return output
 
     def to_png(self, file_name='maze.png', cell_size=30):
-
         handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
+        print("Creating image")
         for bg in range(2):
             for row in self.each_row():
                 for cell in row:
@@ -122,4 +122,6 @@ class Grid(object):
 
                         if not cell.is_linked(cell.south):
                             handler.write_h_line(x1, x2, y2)    # south wall
-            handler.to_png(file_name=file_name)
+
+        print("Writing to file")
+        handler.to_png(file_name=file_name)
