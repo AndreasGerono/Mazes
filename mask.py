@@ -1,5 +1,5 @@
+import cv2 as cv
 import random
-import png
 
 
 class Mask(object):
@@ -30,18 +30,14 @@ class Mask(object):
             return grid
 
     def from_png(self, img_name):
-        data = png.Reader(filename=img_name).read()
-        img_rows = data[2]
-        self.rows = data[1]
-        self.columns = data[0]
-
+        img = cv.imread(img_name, -1)
+        self.rows, self.columns, _ = img.shape
         grid = []
-        for img_row in img_rows:
-            row = []
-            col_rgba = [img_row[i:i + 4] for i in range(0, len(img_row), 4)]
-            for rgba in col_rgba:
-                row.append(True if rgba[0] else False)
-            grid.append(row)
+        for row in range(self.rows):
+            rows = []
+            for col in range(self.columns):
+                rows.append(True if img[row][col][0] else False)
+            grid.append(rows)
 
         return grid
 

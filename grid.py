@@ -1,6 +1,11 @@
 import random
 from cell import Cell
-from png_handler import PNG_handler
+import numpy as np
+import cv2 as cv
+
+
+BLACK = (0, 0, 0, 255)
+TRANSPARENT = (0, 0, 0, 0)
 
 
 class Grid(object):
@@ -24,7 +29,7 @@ class Grid(object):
 
     def __getitem__(self, row_col):
         row, col = row_col
-        if (0 <= row < self.rows) and (0 <= col < self.columns):
+        if (0 <= row < self.rows) and (0 <= col < len(self.grid[row])):
             return self.grid[row][col]
         else:
             return None
@@ -91,9 +96,10 @@ class Grid(object):
 
         return output
 
-    def to_png(self, file_name='maze.png', cell_size=30):
-        handler = PNG_handler(self.columns*cell_size, self.rows*cell_size)  # noqa: E501
-        print("Creating image")
+    def to_png(self, file_name='maze.pnh', cell_size=30, line_thickness=1):
+        height = self.rows * cell_size
+        width = self.columns * cell_size
+        img = np.zeros((height, width, 4), np.uint8)
         for bg in range(2):
             for row in self.each_row():
                 for cell in row:
@@ -105,23 +111,21 @@ class Grid(object):
                     x2 = (cell.column + 1) * cell_size
                     y2 = (cell.row + 1) * cell_size
 
-                    if (bg == 0):
+                    if bg == 0:
                         color = self.background_color_for_cell(cell)
+                        thickness = -1
                         if color is not None:
-                            handler.rect(x1, y1, cell_size, cell_size, color)
+                            cv.rectangle(img, (x1, y1), (x2, y2), color, thickness)  # noqa: E501
 
                     else:
                         if cell.north is None:
-                            handler.write_h_line(x1, x2, y1)    # North wall
-
+                            cv.line(img, (x1, y1), (x2, y1), BLACK, line_thickness)  # noqa: E501
                         if cell.west is None:
-                            handler.write_v_line(y1, y2, x1)    # west wall
+                            cv.line(img, (x1, y1), (x1, y2), BLACK, line_thickness)  # noqa: E501
 
                         if not cell.is_linked(cell.east):
-                            handler.write_v_line(y1, y2, x2)    # east wall
-
+                            cv.line(img, (x2, y1), (x2, y2), BLACK, line_thickness)  # noqa: E501
                         if not cell.is_linked(cell.south):
-                            handler.write_h_line(x1, x2, y2)    # south wall
+                            cv.line(img, (x1, y2), (x2, y2), BLACK, line_thickness)  # noqa: E501
 
-        print("Writing to file")
-        handler.to_png(file_name=file_name)
+        cv.imwrite(file_name, img)

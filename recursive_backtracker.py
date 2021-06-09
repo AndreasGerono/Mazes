@@ -9,8 +9,6 @@ class RecursiveBacktracker(object):
         stack = [current]
         while stack:
             unvisited_neighbours = [neighbour for neighbour in current.neighbours() if not neighbour.links]  # noqa: E501
-
-            # Random walk
             if unvisited_neighbours:
                 neighbour = random.choice(unvisited_neighbours)
                 current.link(neighbour)

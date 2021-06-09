@@ -1,6 +1,5 @@
 from coloredGrid import ColoredGrid
 from cell import Cell
-from grid import Grid
 
 
 class MaskedGrid(ColoredGrid):
