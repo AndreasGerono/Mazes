@@ -1,6 +1,5 @@
 from coloredGrid import ColoredGrid
 from binary_tree import BinaryTree
-from sidewinder import Sidewinder
 
 grid = ColoredGrid(20, 20)
 BinaryTree.on(grid)

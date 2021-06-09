@@ -1,5 +1,4 @@
 from distancegrid import DistanceGrid
-from binary_tree import BinaryTree
 from sidewinder import Sidewinder
 
 new_grid = DistanceGrid(5, 5)

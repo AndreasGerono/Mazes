@@ -1,5 +1,4 @@
 from coloredGrid import ColoredGrid
-
 from hunt_and_kill import HuntAndKill
 
 

@@ -1,5 +1,4 @@
 from coloredGrid import ColoredGrid
-
 from wilson import Wilson
 
 
