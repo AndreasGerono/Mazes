@@ -4,7 +4,6 @@ from distances import Distances
 class Cell(object):
     """docstring for Cell"""
     def __init__(self, row, column):
-        super(Cell, self).__init__()
         self.row = row
         self.column = column
         self.links = dict()
@@ -60,4 +59,7 @@ class Cell(object):
         return distances
 
     def __str__(self):
+        return f'(row: {self.row} col: {self.column})'
+
+    def __repr__(self):
         return f'(row: {self.row} col: {self.column})'

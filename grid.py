@@ -29,7 +29,7 @@ class Grid(object):
 
     def __getitem__(self, row_col):
         row, col = row_col
-        if (0 <= row < self.rows) and (0 <= col < len(self.grid[row])):
+        if (0 <= row < self.rows) and (0 <= col < self.columns):
             return self.grid[row][col]
         else:
             return None
@@ -39,11 +39,10 @@ class Grid(object):
             for c in range(self.columns):
                 cell = self[r, c]
                 if cell is not None:
-                    row, col = cell.row, cell.column
-                    self[r, c].north = self[row-1, col]
-                    self[r, c].south = self[row+1, col]
-                    self[r, c].west = self[row, col-1]
-                    self[r, c].east = self[row, col+1]
+                    cell.north = self[r-1, c]
+                    cell.south = self[r+1, c]
+                    cell.west = self[r, c-1]
+                    cell.east = self[r, c+1]
 
     def deadends(self):
         return [cell for cell in self.each_cell() if len(cell.links) == 1]
