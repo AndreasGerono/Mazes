@@ -11,7 +11,6 @@ TRANSPARENT = (0, 0, 0, 0)
 class Grid(object):
     """docstring for Grid"""
     def __init__(self, rows, columns):
-        super(Grid, self).__init__()
         self.rows = rows
         self.columns = columns
         self.grid = self.prepare_grid()
@@ -68,6 +67,23 @@ class Grid(object):
     def background_color_for_cell(self, cell):
         return None
 
+    def braid(self, p=1):
+        deadends = self.deadends()
+        random.shuffle(deadends)
+
+        for cell in deadends:
+            if len(cell.links) != 1 or random.random() > p:
+                continue
+
+            neighbours = [n for n in cell.neighbours() if not cell.is_linked(n)]  # find all not linked neighbours # noqa: E501
+            # Look optimalizaion - prefer linking to deadends.
+            best = [n for n in neighbours if len(n.links) == 1]
+            if not best:
+                best = neighbours
+
+            neighbour = random.choice(best)
+            cell.link(neighbour)
+
     def __str__(self):
         output = "+" + "----+" * self.columns + "\n"
 
@@ -95,36 +111,104 @@ class Grid(object):
 
         return output
 
-    def to_png(self, file_name='maze.pnh', cell_size=30, line_thickness=1):
-        height = self.rows * cell_size
-        width = self.columns * cell_size
+    def to_png(self, file_name='maze.pnh', cell_size=60, line_thickness=1, inset=0):  # noqa E501
+        height = self.rows * cell_size + line_thickness
+        width = self.columns * cell_size + line_thickness
         img = np.zeros((height, width, 4), np.uint8)
-        for bg in range(2):
+        inset = round(cell_size * inset)
+        for mode in ("bg", "walls"):
             for row in self.each_row():
                 for cell in row:
                     if cell is None:
                         continue
 
-                    x1 = cell.column * cell_size
-                    y1 = cell.row * cell_size
-                    x2 = (cell.column + 1) * cell_size
-                    y2 = (cell.row + 1) * cell_size
+                    x = cell.column * cell_size
+                    y = cell.row * cell_size
 
-                    if bg == 0:
-                        color = self.background_color_for_cell(cell)
-                        thickness = -1
-                        if color is not None:
-                            cv.rectangle(img, (x1, y1), (x2, y2), color, thickness)  # noqa: E501
-
+                    if inset > 0:
+                        self._png_with_inset(img, cell, mode, cell_size, x, y, inset, line_thickness)  # noqa E501
                     else:
-                        if cell.north is None:
-                            cv.line(img, (x1, y1), (x2, y1), BLACK, line_thickness)  # noqa: E501
-                        if cell.west is None:
-                            cv.line(img, (x1, y1), (x1, y2), BLACK, line_thickness)  # noqa: E501
-
-                        if not cell.is_linked(cell.east):
-                            cv.line(img, (x2, y1), (x2, y2), BLACK, line_thickness)  # noqa: E501
-                        if not cell.is_linked(cell.south):
-                            cv.line(img, (x1, y2), (x2, y2), BLACK, line_thickness)  # noqa: E501
+                        self._png_without_inset(img, cell, mode, cell_size, x, y, line_thickness)  # noqa E501
 
         cv.imwrite(file_name, img)
+
+    @staticmethod
+    def _cell_cordinates_with_inset(x, y, cell_size, inset):
+        x1, x4 = x, x + cell_size
+        x2 = x1 + inset
+        x3 = x4 - inset
+
+        y1, y4 = y, y + cell_size
+        y2 = y1 + inset
+        y3 = y4 - inset
+        return x1, x2, x3, x4, y1, y2, y3, y4
+
+
+    def _png_with_inset(self, img, cell, mode, cell_size, x, y, inset, line_thickness):  # noqa E501
+        x1, x2, x3, x4, y1, y2, y3, y4 = self._cell_cordinates_with_inset(x, y, cell_size, inset)  # noqa E501
+        if mode == "bg":
+            x2 += round(line_thickness/2)
+            x3 -= round(line_thickness/2)
+            y2 += round(line_thickness/2)
+            y3 -= round(line_thickness/2)
+
+            color = self.background_color_for_cell(cell)
+            thickness = -1
+            if color is not None:
+                cv.rectangle(img, (x2, y2), (x3, y3), color, thickness)
+                if cell.is_linked(cell.north) and self.background_color_for_cell(cell.north):  # noqa: E501
+                    cv.rectangle(img, (x2, y2), (x3, y1), color, thickness)
+                if cell.is_linked(cell.south) and self.background_color_for_cell(cell.south):  # noqa: E501
+                    cv.rectangle(img, (x2, y3), (x3, y4), color, thickness)  # noqa: E501
+                if cell.is_linked(cell.east) and self.background_color_for_cell(cell.east):  # noqa: E501
+                    cv.rectangle(img, (x3, y2), (x4, y3), color, thickness)
+                if cell.is_linked(cell.west) and self.background_color_for_cell(cell.west):  # noqa: E501
+                    cv.rectangle(img, (x1, y2), (x2, y3), color, thickness)
+        else:
+            if cell.is_linked(cell.north):
+                cv.line(img, (x2, y1), (x2, y2), BLACK, line_thickness)
+                cv.line(img, (x3, y1), (x3, y2), BLACK, line_thickness)
+            else:
+                cv.line(img, (x2, y2), (x3, y2), BLACK, line_thickness)
+
+            if cell.is_linked(cell.south):
+                cv.line(img, (x2, y3), (x2, y4), BLACK, line_thickness)
+                cv.line(img, (x3, y3), (x3, y4), BLACK, line_thickness)
+            else:
+                cv.line(img, (x2, y3), (x3, y3), BLACK, line_thickness)
+
+            if cell.is_linked(cell.west):
+                cv.line(img, (x1, y2), (x2, y2), BLACK, line_thickness)
+                cv.line(img, (x1, y3), (x2, y3), BLACK, line_thickness)
+            else:
+                cv.line(img, (x2, y2), (x2, y3), BLACK, line_thickness)
+
+            if cell.is_linked(cell.east):
+                cv.line(img, (x3, y2), (x4, y2), BLACK, line_thickness)
+                cv.line(img, (x3, y3), (x4, y3), BLACK, line_thickness)
+            else:
+                cv.line(img, (x3, y2), (x3, y3), BLACK, line_thickness)
+
+
+    def _png_without_inset(self, img, cell, mode, cell_size, x, y, line_thickness):  # noqa E501
+        x1, y1 = x, y
+        x2 = x1 + cell_size
+        y2 = y1 + cell_size
+        line_thickness = 1
+
+        if mode == "bg":
+            color = self.background_color_for_cell(cell)
+            thickness = -1
+            if color is not None:
+                cv.rectangle(img, (x1, y1), (x2, y2), color, thickness)  # noqa: E501
+
+        else:
+            if cell.north is None:
+                cv.line(img, (x1, y1), (x2, y1), BLACK, line_thickness)  # noqa: E501
+            if cell.west is None:
+                cv.line(img, (x1, y1), (x1, y2), BLACK, line_thickness)  # noqa: E501
+
+            if not cell.is_linked(cell.east):
+                cv.line(img, (x2, y1), (x2, y2), BLACK, line_thickness)  # noqa: E501
+            if not cell.is_linked(cell.south):
+                cv.line(img, (x1, y2), (x2, y2), BLACK, line_thickness)  # noqa: E501

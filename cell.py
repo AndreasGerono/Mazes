@@ -41,6 +41,7 @@ class Cell(object):
 
         return neighbours
 
+    @property
     def distances(self):
         distances = Distances(self)
         frontier = [self]
