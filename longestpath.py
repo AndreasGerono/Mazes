@@ -1,6 +1,4 @@
 from distancegrid import DistanceGrid
-from binary_tree import BinaryTree
-from sidewinder import Sidewinder
 from wilson import Wilson
 
 grid = DistanceGrid(15, 15)

@@ -1,16 +1,17 @@
+from __future__ import annotations
 from distances import Distances
 
 
-class Cell(object):
+class Cell:
     """docstring for Cell"""
     def __init__(self, row, column):
         self.row = row
         self.column = column
         self.links = dict()
-        self.north = None
-        self.south = None
-        self.west = None
-        self.east = None
+        self.north: Cell = None
+        self.south: Cell = None
+        self.west: Cell = None
+        self.east: Cell = None
 
     def link(self, cell, bidi=True):
         self.links[cell] = True
@@ -28,7 +29,7 @@ class Cell(object):
     def is_linked(self, cell):
         return cell in self.links
 
-    def neighbours(self):
+    def neighbours(self) -> list[Cell]:
         neighbours = []
         if self.north is not None:
             neighbours.append(self.north)
@@ -42,7 +43,7 @@ class Cell(object):
         return neighbours
 
     @property
-    def distances(self):
+    def distances(self) -> Distances:
         distances = Distances(self)
         frontier = [self]
 
@@ -63,4 +64,4 @@ class Cell(object):
         return f'(row: {self.row} col: {self.column})'
 
     def __repr__(self):
-        return f'(row: {self.row} col: {self.column})'
+        return f'(row: {self.row} col: {self.column} class: {self.__class__})'

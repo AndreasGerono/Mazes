@@ -1,3 +1,8 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from cell import Cell
+
 
 class Distances(object):
     """docstring for Disance"""
@@ -14,10 +19,10 @@ class Distances(object):
         self._cells[cell] = distance
 
     @property
-    def cells(self):
+    def cells(self) -> list[Cell]:
         return list(self._cells)
 
-    def path_to(self, goal):
+    def path_to(self, goal: Cell):
         current = goal
 
         breadcrubs = Distances(self.root)
@@ -30,7 +35,7 @@ class Distances(object):
                     current = neighbor
         return breadcrubs
 
-    def max(self):
+    def max(self) -> tuple[Cell, int]:
         max_discance = 0
         max_cell = self.root
         for cell, distance in self._cells.items():

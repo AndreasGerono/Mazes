@@ -26,7 +26,7 @@ class Grid(object):
             grid.append(rows)
         return grid
 
-    def __getitem__(self, row_col):
+    def __getitem__(self, row_col) -> Cell:
         row, col = row_col
         if (0 <= row < self.rows) and (0 <= col < self.columns):
             return self.grid[row][col]
@@ -43,10 +43,10 @@ class Grid(object):
                     cell.west = self[r, c-1]
                     cell.east = self[r, c+1]
 
-    def deadends(self):
+    def deadends(self) -> list[Cell]:
         return [cell for cell in self.each_cell() if len(cell.links) == 1]
 
-    def random_cell(self):
+    def random_cell(self) -> Cell:
         row = random.randrange(self.rows)
         col = random.randrange(self.columns)
 
@@ -55,10 +55,10 @@ class Grid(object):
     def size(self):
         return self.rows * self.columns
 
-    def each_row(self):
+    def each_row(self) -> list[list[Cell]]:
         return (row for row in self.grid)
 
-    def each_cell(self):
+    def each_cell(self) -> Cell:
         return (cell for row in self.each_row() for cell in row)
 
     def content_of(self, cell):
@@ -117,35 +117,33 @@ class Grid(object):
         img = np.zeros((height, width, 4), np.uint8)
         inset = round(cell_size * inset)
         for mode in ("bg", "walls"):
-            for row in self.each_row():
-                for cell in row:
-                    if cell is None:
-                        continue
+            for cell in self.each_cell():
+                if cell is None:
+                    continue
+                x = cell.column * cell_size
+                y = cell.row * cell_size
 
-                    x = cell.column * cell_size
-                    y = cell.row * cell_size
-
-                    if inset > 0:
-                        self._png_with_inset(img, cell, mode, cell_size, x, y, inset, line_thickness)  # noqa E501
-                    else:
-                        self._png_without_inset(img, cell, mode, cell_size, x, y, line_thickness)  # noqa E501
+                if inset > 0:
+                    self._png_with_inset(img, cell, mode, cell_size, x, y, inset, line_thickness)  # noqa E501
+                else:
+                    self._png_without_inset(img, cell, mode, cell_size, x, y, line_thickness)  # noqa E501
 
         cv.imwrite(file_name, img)
 
     @staticmethod
-    def _cell_cordinates_with_inset(x, y, cell_size, inset):
-        x1, x4 = x, x + cell_size
+    def _cell_cordinates_with_inset(x, y, cell_size, inset, line_thickness):
+        x1, x4 = x - line_thickness, x + cell_size
         x2 = x1 + inset
         x3 = x4 - inset
 
-        y1, y4 = y, y + cell_size
+        y1, y4 = y - line_thickness, y + cell_size
         y2 = y1 + inset
         y3 = y4 - inset
         return x1, x2, x3, x4, y1, y2, y3, y4
 
 
     def _png_with_inset(self, img, cell, mode, cell_size, x, y, inset, line_thickness):  # noqa E501
-        x1, x2, x3, x4, y1, y2, y3, y4 = self._cell_cordinates_with_inset(x, y, cell_size, inset)  # noqa E501
+        x1, x2, x3, x4, y1, y2, y3, y4 = self._cell_cordinates_with_inset(x, y, cell_size, inset, line_thickness)  # noqa E501
         if mode == "bg":
             x2 += round(line_thickness/2)
             x3 -= round(line_thickness/2)
